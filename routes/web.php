@@ -1,117 +1,85 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
-// Controller Halaman Statis (Baru)
-use App\Http\Controllers\PageController;
-// Controller Customer
-use App\Http\Controllers\Customer\ReservasiController as CustomerReservasiController;
-use App\Http\Controllers\Customer\LapanganController as CustomerLapanganController;
-// Controller Admin
-use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Admin\LapanganController as AdminLapanganController;
-use App\Http\Controllers\Admin\ReservasiController as AdminReservasiController;
-// Facades
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ProfileController;
+// Import Controllers Utama
+use App\Http\Controllers\ReservasiController;
+use App\Http\Controllers\LapanganController;
+use App\Http\Controllers\PageController; // Untuk rute statis (home, about, contact)
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\ReservasiController as AdminReservasiController;
+use App\Http\Controllers\Admin\LapanganController as AdminLapanganController;
+
 
 /*
 |--------------------------------------------------------------------------
-| Web Routes
+| 1. PUBLIC ROUTES (Dapat diakses tanpa login)
 |--------------------------------------------------------------------------
-|
-| File ini mengatur seluruh jalur URL aplikasi eFutsal.
-|
 */
 
-// --- 1. HALAMAN PUBLIK (Bisa diakses tanpa login) ---
+// Rute utama (Homepage)
 Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
-Route::get('/about', [PageController::class, 'about'])->name('about');
-Route::get('/contact', [PageController::class, 'contact'])->name('contact');
+// Rute Halaman Statis (Menggunakan PageController)
+Route::get('/tentang-kami', [PageController::class, 'about'])->name('about');
+Route::get('/kontak', [PageController::class, 'contact'])->name('contact');
 
+// Jika halaman Lapangan ingin dilihat tanpa login, pindahkan route di bawah ini ke sini.
+// Namun, biasanya untuk booking butuh login, jadi saya biarkan di middleware 'auth'.
 
-// --- 2. PENGARAH DASHBOARD (REDIRECTOR) ---
-// Logika: Setelah login, cek role user lalu arahkan ke halaman yang sesuai.
-Route::get('/dashboard', function () {
-    /** @var \App\Models\User $user */
-    $user = Auth::user();
-
-    // Jika Admin (is_admin = 1), ke Dashboard Admin
-    if ($user && $user->is_admin) {
-        return redirect()->route('admin.dashboard');
-    }
+/*
+|--------------------------------------------------------------------------
+| 2. AUTHENTICATED USER ROUTES (Hanya bisa diakses setelah login)
+|--------------------------------------------------------------------------
+*/
+Route::middleware('auth')->group(function () {
     
-    // Jika User Biasa (is_admin = 0), ke Halaman Reservasi Saya
-    return redirect()->route('reservasi.index'); 
-})->middleware(['auth', 'verified'])->name('dashboard');
-
-
-// --- 3. AREA CUSTOMER (User yang sudah login) ---
-Route::middleware(['auth', 'verified'])->group(function () {
+    // Dashboard User
+    Route::get('/dashboard', function () {
+        return view('dashboard');
+    })->name('dashboard');
     
-    // Lihat Daftar Lapangan
-    Route::get('/lapangan', [CustomerLapanganController::class, 'index'])
-        ->name('lapangan.index');
-    
-    // --- MENU RESERVASI ---
-
-    // [BARU] Route AJAX untuk Cek Ketersediaan (Tanpa Reload)
-    // Penting: Diletakkan sebelum route yang pakai {parameter} agar tidak tertukar
-    Route::get('/reservasi/check', [CustomerReservasiController::class, 'checkAvailability'])
-        ->name('reservasi.check');
-    
-    // History Booking
-    Route::get('/reservasi', [CustomerReservasiController::class, 'index'])
-        ->name('reservasi.index'); 
-    
-    // Form Booking
-    Route::get('/reservasi/create', [CustomerReservasiController::class, 'create'])
-        ->name('reservasi.create'); 
-    
-    // Proses Simpan
-    Route::post('/reservasi', [CustomerReservasiController::class, 'store'])
-        ->name('reservasi.store'); 
-    
-    // --- Route Approval via WhatsApp (GET Request) ---
-    Route::get('/reservasi/{id}/approve', [CustomerReservasiController::class, 'approve'])
-        ->name('reservasi.approve');
-    Route::get('/reservasi/{id}/reject', [CustomerReservasiController::class, 'reject'])
-        ->name('reservasi.reject');
-    
-    // Pengaturan Profil (Bawaan Breeze)
+    // Profil User
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    
+    // Lapangan (Daftar Lapangan untuk Customer)
+    // Berdasarkan struktur folder Anda: resources/views/customer/lapangan/index.blade.php
+    Route::get('/lapangan', [LapanganController::class, 'index'])->name('lapangan.index');
+
+    // Reservasi (Customer)
+    // Berdasarkan struktur folder Anda: resources/views/customer/reservasi/create.blade.php
+    Route::get('/reservasi/create', [ReservasiController::class, 'create'])->name('reservasi.create');
+    Route::post('/reservasi', [ReservasiController::class, 'store'])->name('reservasi.store');
+    // Riwayat Reservasi Customer
+    Route::get('/reservasi', [ReservasiController::class, 'index'])->name('reservasi.index');
 });
 
 
-// --- 4. AREA ADMIN (Khusus Role Admin) ---
-// Middleware 'admin' wajib ada di kernel (bootstrap/app.php)
-Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+/*
+|--------------------------------------------------------------------------
+| 3. ADMIN ROUTES (Hanya bisa diakses oleh Admin)
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     
-    // Dashboard Statistik
-    Route::get('/dashboard', [DashboardController::class, 'index'])
-        ->name('dashboard');
+    // Dashboard Admin
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // Manajemen Lapangan (CRUD)
+    // Manajemen Lapangan
     Route::resource('lapangan', AdminLapanganController::class);
 
-    // Manajemen Reservasi (Halaman Admin)
-    Route::get('/reservasi', [AdminReservasiController::class, 'index'])
-        ->name('reservasi.index');
-
-    // === PAGE KHUSUS REVIEW DARI WA (Opsional jika ingin detail view) ===
-    Route::get('/reservasi/{reservasi}/review', [AdminReservasiController::class, 'review'])
-        ->name('reservasi.review');
-
-    // Tombol Aksi di Dashboard Admin (Biasanya berupa Form POST)
-    Route::post('/reservasi/{reservasi}/approve', [AdminReservasiController::class, 'approve'])
-        ->name('reservasi.approve');
-    Route::post('/reservasi/{reservasi}/reject', [AdminReservasiController::class, 'reject'])
-        ->name('reservasi.reject');
+    // Manajemen Reservasi
+    Route::get('reservasi', [AdminReservasiController::class, 'index'])->name('reservasi.index');
+    Route::patch('reservasi/{reservasi}/konfirmasi', [AdminReservasiController::class, 'confirm'])->name('reservasi.confirm');
+    Route::patch('reservasi/{reservasi}/tolak', [AdminReservasiController::class, 'reject'])->name('reservasi.reject');
+    
+    // Manajemen User
+    Route::resource('users', UserController::class)->only(['index', 'destroy']);
 });
 
-// Memuat route otentikasi (Login, Register, dll)
 require __DIR__.'/auth.php';

@@ -90,8 +90,8 @@
             </header>
 
             <main class="flex-1 overflow-y-auto bg-slate-900 p-6">
-                {{ $slot }}
-            </main>
+    @yield('content')  {{-- <--- GUNAKAN INI --}}
+</main>
         </div>
     </div>
 </body>

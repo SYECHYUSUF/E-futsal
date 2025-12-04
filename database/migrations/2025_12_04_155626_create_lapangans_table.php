@@ -6,24 +6,20 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
-{
-    Schema::create('lapangan', function (Blueprint $table) {
-        $table->id();
-        $table->string('nama', 100);
-        $table->string('gambar')->nullable();
-        $table->unsignedSmallInteger('kapasitas');
-        $table->unsignedInteger('biaya_per_jam');
-        $table->timestamps();
-    });
-} 
+    {
+        // Guna "lapangans" (plural) bukan "lapangan"
+        Schema::create('lapangans', function (Blueprint $table) {
+            $table->id();
+            $table->string('nama');
+            $table->string('jenis'); // vinyl, sintetis, semen
+            $table->text('deskripsi')->nullable();
+            $table->integer('harga_per_jam'); // Pastikan ini integer
+            $table->string('gambar')->nullable();
+            $table->timestamps();
+        });
+    }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('lapangans');

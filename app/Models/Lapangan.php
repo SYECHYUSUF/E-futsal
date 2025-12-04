@@ -1,14 +1,21 @@
-<?php 
+<?php
 
 namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Lapangan extends Model
 {
-    protected $table = 'lapangan';
-    protected $guarded = ['id'];
+    use HasFactory;
 
-    public function reservasi() {
-        return $this->hasMany(Reservasi::class);
-    }
+    // Tambahkan baris ini
+    protected $table = 'lapangan';
+
+    protected $fillable = [
+        'nama', 
+        'kapasitas', 
+        'biaya_per_jam', 
+        'gambar'
+    ];
 }

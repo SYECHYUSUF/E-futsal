@@ -35,7 +35,7 @@
             @endisset
 
             <main>
-                {{ $slot }}
+                @yield('content') {{-- <--- Menerima konten dari @section('content') --}}
             </main>
         </div>
     </body>

@@ -2,40 +2,36 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Reservasi extends Model
 {
-    use HasFactory;
-
     protected $table = 'reservasi';
 
     protected $fillable = [
-        'user_id',
-        'lapangan_id',
-        'date',
-        'start_time',
-        'end_time',
-        'duration_hours', // Wajib ada untuk menyimpan lama main
-        'total_price',
+        'user_id', 
+        'lapangan_id', 
+        'tanggal_booking',
+        'jam_mulai',
+        'jam_selesai',
+        'total_price', 
         'status',
     ];
 
-    // Mengubah data database menjadi objek Carbon (Tanggal)
-    protected $casts = [
-        'date' => 'datetime',
-        'start_time' => 'datetime',
-        'end_time' => 'datetime',
-    ];
-
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
-
-    public function lapangan()
+    /**
+     * Hubungan: Reservasi dimiliki oleh satu Lapangan (BelongsTo).
+     */
+    public function lapangan(): BelongsTo
     {
         return $this->belongsTo(Lapangan::class);
+    }
+    
+    /**
+     * Hubungan: Reservasi dimiliki oleh satu User (BelongsTo).
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 }
