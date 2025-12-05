@@ -19,24 +19,21 @@
                 <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
                     {{-- Navigasi Admin --}}
                     @if (Auth::user()->is_admin)
-                        <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')" class="text-slate-300 hover:text-white">
-                            {{ __('Admin Dashboard') }}
-                        </x-nav-link>
+                    <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')" class="text-slate-300 hover:text-white">
+                        {{ __('Admin Dashboard') }}
+                    </x-nav-link>
                     @endif
 
                     {{-- Navigasi User Biasa --}}
                     @if (Auth::user()->is_admin === false)
-                        <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" class="text-slate-300 hover:text-white">
-                            {{ __('Dashboard') }}
-                        </x-nav-link>
+                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" class="text-slate-300 hover:text-white">
+                        {{ __('Dashboard') }}
+                    </x-nav-link>
                     @endif
-
-
-
 
                     {{-- Tambahkan link lain di sini jika perlu --}}
                     {{-- Contoh: Daftar Lapangan --}}
-                    {{-- <x-nav-link :href="route('lapangan.index')" :active="request()->routeIs('lapangan.index')" class="text-slate-300 hover:text-white">
+                    {{-- <x-nav-link :href="route('fields.index')" :active="request()->routeIs('fields.index')" class="text-slate-300 hover:text-white">
                         {{ __('Lapangan') }}
                     </x-nav-link> --}}
 

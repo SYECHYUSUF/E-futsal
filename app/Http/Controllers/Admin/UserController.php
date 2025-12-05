@@ -17,8 +17,8 @@ class UserController extends Controller
 
     public function approve(User $user)
     {
-        $user->update(['is_active' => true]);
-
+        $user->is_active = true;
+        $user->save();
         // Opsional: Kirim WA notifikasi akun aktif
 
         return back()->with('success', 'Akun berhasil disetujui/diaktifkan.');

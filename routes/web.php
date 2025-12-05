@@ -2,84 +2,57 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
-// Import Controllers Utama
-use App\Http\Controllers\ReservasiController;
-use App\Http\Controllers\LapanganController;
-use App\Http\Controllers\PageController; // Untuk rute statis (home, about, contact)
+use App\Http\Controllers\Customer\ReservationController as CustomerReservationController;
+use App\Http\Controllers\FieldController;
+use App\Http\Controllers\PageController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\UserController;
-use App\Http\Controllers\Admin\ReservasiController as AdminReservasiController;
-use App\Http\Controllers\Admin\LapanganController as AdminLapanganController;
+use App\Http\Controllers\Admin\ReservationController as AdminReservationController;
+use App\Http\Controllers\Admin\FieldController as AdminFieldController;
 
-
-/*
-|--------------------------------------------------------------------------
-| 1. PUBLIC ROUTES (Dapat diakses tanpa login)
-|--------------------------------------------------------------------------
-*/
-
-// Rute utama (Homepage)
 Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
-// Rute Halaman Statis (Menggunakan PageController)
-Route::get('/tentang-kami', [PageController::class, 'about'])->name('about');
-Route::get('/kontak', [PageController::class, 'contact'])->name('contact');
+Route::get('/about-us', [PageController::class, 'about'])->name('about');
+Route::get('/contact', [PageController::class, 'contact'])->name('contact');
 
-// Jika halaman Lapangan ingin dilihat tanpa login, pindahkan route di bawah ini ke sini.
-// Namun, biasanya untuk booking butuh login, jadi saya biarkan di middleware 'auth'.
-
-/*
-|--------------------------------------------------------------------------
-| 2. AUTHENTICATED USER ROUTES (Hanya bisa diakses setelah login)
-|--------------------------------------------------------------------------
-*/
 Route::middleware('auth')->group(function () {
-    
-    // Dashboard User
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
-    
-    // Profil User
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-    
-    // Lapangan (Daftar Lapangan untuk Customer)
-    // Berdasarkan struktur folder Anda: resources/views/customer/lapangan/index.blade.php
-    Route::get('/lapangan', [LapanganController::class, 'index'])->name('lapangan.index');
 
-    // Reservasi (Customer)
-    // Berdasarkan struktur folder Anda: resources/views/customer/reservasi/create.blade.php
-    Route::get('/reservasi/create', [ReservasiController::class, 'create'])->name('reservasi.create');
-    Route::post('/reservasi', [ReservasiController::class, 'store'])->name('reservasi.store');
-    // Riwayat Reservasi Customer
-    Route::get('/reservasi', [ReservasiController::class, 'index'])->name('reservasi.index');
+    Route::get('/fields', [FieldController::class, 'index'])->name('customer.fields.index');
+
+    Route::get('/reservations/create', [CustomerReservationController::class, 'create'])->name('reservations.create');
+    Route::post('/reservations', [CustomerReservationController::class, 'store'])->name('reservations.store');
+    Route::get('/reservations', [CustomerReservationController::class, 'index'])->name('reservations.index');
+    Route::get('/reservations/{reservation}', [CustomerReservationController::class, 'show'])->name('reservations.show');
+    Route::patch('/reservations/{reservation}/payment', [CustomerReservationController::class, 'uploadPayment'])->name('reservations.payment');
 });
 
-
-/*
-|--------------------------------------------------------------------------
-| 3. ADMIN ROUTES (Hanya bisa diakses oleh Admin)
-|--------------------------------------------------------------------------
-*/
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
-    
-    // Dashboard Admin
+
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // Manajemen Lapangan
-    Route::resource('lapangan', AdminLapanganController::class);
+    Route::resource('fields', AdminFieldController::class);
 
-    // Manajemen Reservasi
-    Route::get('reservasi', [AdminReservasiController::class, 'index'])->name('reservasi.index');
-    Route::patch('reservasi/{reservasi}/konfirmasi', [AdminReservasiController::class, 'confirm'])->name('reservasi.confirm');
-    Route::patch('reservasi/{reservasi}/tolak', [AdminReservasiController::class, 'reject'])->name('reservasi.reject');
-    
-    // Manajemen User
+    Route::delete('gallery/{galleryId}', [AdminFieldController::class, 'deleteGallery'])->name('fields.gallery.delete');
+    Route::patch('fields/{field}/gallery', [AdminFieldController::class, 'updateGallery'])->name('fields.gallery.update');
+    Route::patch('fields/{field}/facilities', [AdminFieldController::class, 'updateFacilities'])->name('fields.facilities.update');
+
+    Route::get('reservations', [AdminReservationController::class, 'index'])->name('reservations.index');
+    Route::get('reservations/{reservation}', [AdminReservationController::class, 'show'])->name('reservations.show');
+    Route::patch('reservations/{reservation}/approve', [AdminReservationController::class, 'approve'])->name('reservations.approve');
+    Route::patch('reservations/{reservation}/reject', [AdminReservationController::class, 'reject'])->name('reservations.reject');
+
     Route::resource('users', UserController::class)->only(['index', 'destroy']);
+
+    Route::patch('users/{user}/approve', [UserController::class, 'approve'])->name('users.approve');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

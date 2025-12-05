@@ -5,28 +5,29 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Reservasi extends Model
+class Reservation extends Model
 {
-    protected $table = 'reservasi';
 
     protected $fillable = [
-        'user_id', 
-        'lapangan_id', 
-        'tanggal_booking',
-        'jam_mulai',
-        'jam_selesai',
-        'total_price', 
+        'user_id',
+        'field_id',
+        'booking_date',
+        'start_time',
+        'end_time',
+        'total_price',
         'status',
+        'payment_proof',
+        'rejection_reason',
     ];
 
     /**
-     * Hubungan: Reservasi dimiliki oleh satu Lapangan (BelongsTo).
+     * Hubungan: Reservasi dimiliki oleh satu Field (BelongsTo).
      */
-    public function lapangan(): BelongsTo
+    public function field(): BelongsTo
     {
-        return $this->belongsTo(Lapangan::class);
+        return $this->belongsTo(Field::class);
     }
-    
+
     /**
      * Hubungan: Reservasi dimiliki oleh satu User (BelongsTo).
      */

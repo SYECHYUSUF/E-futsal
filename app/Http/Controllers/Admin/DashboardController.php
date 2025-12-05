@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Lapangan;
-use App\Models\Reservasi;
+use App\Models\Field;       // Sebelumnya: Lapangan
+use App\Models\Reservation; // Sebelumnya: Reservasi
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -12,20 +12,26 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        // Statistik Sederhana
-        $totalPendapatan = Reservasi::where('status', 'paid')->orWhere('status', 'confirmed')->sum('total_price');
-        $totalBooking = Reservasi::count();
-        $bookingPending = Reservasi::where('status', 'pending')->count();
-        $totalUser = User::where('is_admin', false)->count();
+        $totalRevenue = Reservation::where('status', 'paid')
+            ->orWhere('status', 'confirmed')
+            ->sum('total_price');
 
-        // 5 Booking Terakhir
-        $latestBookings = Reservasi::with(['user', 'lapangan'])->latest()->take(5)->get();
+        $totalBookings = Reservation::count();
+
+        $pendingBookings = Reservation::where('status', 'pending')->count();
+
+        $totalUsers = User::where('is_admin', false)->count();
+
+        $latestBookings = Reservation::with(['user', 'field'])
+            ->latest()
+            ->take(5)
+            ->get();
 
         return view('admin.dashboard', compact(
-            'totalPendapatan', 
-            'totalBooking', 
-            'bookingPending', 
-            'totalUser',
+            'totalRevenue',
+            'totalBookings',
+            'pendingBookings',
+            'totalUsers',
             'latestBookings'
         ));
     }

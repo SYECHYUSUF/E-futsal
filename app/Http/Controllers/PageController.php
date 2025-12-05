@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 
 class PageController extends Controller
 {
@@ -14,7 +13,7 @@ class PageController extends Controller
     {
         return view('pages.about');
     }
-    
+
     /**
      * Menampilkan halaman Kontak (Contact).
      * Menggunakan view: resources/views/pages/contact.blade.php

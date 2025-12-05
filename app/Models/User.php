@@ -2,12 +2,10 @@
 
 namespace App\Models;
 
-// WAJIB: Import kelas untuk relasi
-use Illuminate\Database\Eloquent\Relations\HasMany; 
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use App\Models\Reservasi; // Wajib di-import
 
 class User extends Authenticatable
 {
@@ -22,8 +20,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'phone_number', // Tambahkan jika ada di migrasi
-        'is_admin',     // Tambahkan jika ada di migrasi
+        'phone',
+        'is_admin',
+        'is_active',
     ];
 
     /**
@@ -46,16 +45,12 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
-            'is_admin' => 'boolean', // Pastikan ini ada
+            'is_admin' => 'boolean',
         ];
     }
 
-    /**
-     * Dapatkan semua reservasi untuk user.
-     */
-    public function reservasis(): HasMany
+    public function reservations(): HasMany
     {
-        // Menggunakan FQCN untuk menghindari masalah cache/autoloading
-        return $this->hasMany(Reservasi::class);
+        return $this->hasMany(Reservation::class);
     }
 }
