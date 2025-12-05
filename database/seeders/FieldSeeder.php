@@ -14,7 +14,7 @@ class FieldSeeder extends Seeder
                 'name' => 'Lapangan Vinyl A (Indoor)',
                 'capacity' => 10,
                 'hourly_rate' => 150000,
-                'image' => 'field_images/lapangan_vinyl_a.jpg',
+                'image' => 'https://centroflor.id/wp-content/uploads/elementor/thumbs/Lapangan-dengan-Karpet-Badminton-Biru-q4gr7f6l5wmnkdww4oaoanbaw805fkwle81xchf53c.jpg',
             ],
             [
                 'name' => 'Lapangan Rumput Sintetis B',

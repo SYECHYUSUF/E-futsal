@@ -23,8 +23,10 @@ class ReservationController extends Controller
 
     public function index()
     {
-        $reservations = Auth::user()
-            ->reservations()
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        $reservations = $user->reservations()
             ->with('field')
             ->latest()
             ->get();
@@ -50,15 +52,17 @@ class ReservationController extends Controller
 
     public function store(Request $request)
     {
+        // 1. Validasi
         $request->validate([
             'field_id'     => 'required|exists:fields,id',
             'booking_date' => 'required|date|after_or_equal:today',
             'start_time'   => 'required',
-            'end_time'     => 'required|after:start_time',
+            'end_time'     => 'required',
         ]);
 
         $field = Field::findOrFail($request->field_id);
 
+        // 2. Setup Waktu
         $bookingDate = $request->booking_date;
         $startTime   = $request->start_time;
         $endTime     = $request->end_time;
@@ -66,18 +70,28 @@ class ReservationController extends Controller
         $start = Carbon::createFromFormat('Y-m-d H:i', $bookingDate . ' ' . $startTime);
         $end   = Carbon::createFromFormat('Y-m-d H:i', $bookingDate . ' ' . $endTime);
 
+        // 3. Logika Lintas Hari (Overnight)
+        // Jika jam selesai lebih kecil dari jam mulai (misal: Mulai 23:00, Selesai 01:00)
+        // Maka anggap selesai besok harinya.
         if ($end->lessThanOrEqualTo($start)) {
             $end->addDay();
         }
 
-        $duration = $end->diffInHours($start);
+        // 4. Hitung Durasi via Timestamp (Anti Minus)
+        // Rumus: (Waktu Selesai - Waktu Mulai) dalam detik / 3600 detik
+        $seconds = $end->timestamp - $start->timestamp;
+        $duration = $seconds / 3600;
 
-        // if ($duration < 1) {
-        //     return back()->withErrors(['end_time' => 'Durasi minimal 1 jam.'])->withInput();
-        // }
+        // Validasi Booking Aneh (Misal durasi 0 atau negatif karena kesalahan sistem)
+        if ($duration <= 0) {
+            return back()->withErrors(['end_time' => 'Durasi booking tidak valid.'])->withInput();
+        }
 
-        $totalPrice = $duration * $field->hourly_rate;
+        // 5. Hitung Harga
+        // ceil() membulatkan ke atas (misal main 1.5 jam dihitung bayar 2 jam, ubah jika kebijakan beda)
+        $totalPrice = ceil($duration) * $field->hourly_rate;
 
+        // 6. Simpan
         $reservation = Reservation::create([
             'user_id'      => Auth::id(),
             'field_id'     => $field->id,
@@ -88,15 +102,16 @@ class ReservationController extends Controller
             'status'       => 'pending',
         ]);
 
+        // 7. Notifikasi WA
         $message = "Halo Admin, ada booking baru dari *" . Auth::user()->name . "*.\n\n";
-        $message .= "Lapangan: *" . $field->name . "*\n"; // $field->name
+        $message .= "Lapangan: *" . $field->name . "*\n";
         $message .= "Tanggal: *" . Carbon::parse($reservation->booking_date)->format('d F Y') . "*\n";
         $message .= "Jam: *" . $reservation->start_time . " - " . $reservation->end_time . "*\n";
+        $message .= "Durasi: *" . $duration . " Jam*\n";
         $message .= "Total Harga: *Rp " . number_format($totalPrice, 0, ',', '.') . "*\n\n";
         $message .= "Mohon segera dikonfirmasi.";
 
         $adminNumber = env('WHATSAPP_ADMIN_NUMBER');
-
         if ($adminNumber) {
             $this->whatsappService->sendMessage($adminNumber, $message);
         }

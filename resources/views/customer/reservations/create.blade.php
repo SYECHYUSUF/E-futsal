@@ -213,42 +213,43 @@
             const endVal = endInput.value;
 
             if (startVal && endVal) {
+                // Ambil angka jam saja (substring 0-2)
                 const startHour = parseInt(startVal.substring(0, 2));
                 const endHour = parseInt(endVal.substring(0, 2));
 
                 let durasi = 0;
 
                 if (endHour > startHour) {
+                    // Kasus normal (Main jam 14 s/d 16) = 2 jam
                     durasi = endHour - startHour;
                 } else if (endHour < startHour) {
-                    // Lintas hari (23:00 - 01:00)
+                    // Kasus lintas hari (Main jam 23 s/d 01)
+                    // (24 - 23) + 1 = 2 jam
                     durasi = (24 - startHour) + endHour;
                 } else {
+                    // Jam sama persis (Main jam 14 s/d 14) = 0 jam (invalid)
                     durasi = 0;
                 }
 
                 // Tampilkan Hasil
                 if (durasi > 0) {
                     durasiDisplay.textContent = `Durasi: ${durasi} Jam`;
-
-                    const total = durasi * hourlyRate;
+                    
+                    // Hitung total (bulatkan durasi ke atas jika kebijakan anda membulatkan jam)
+                    const total = Math.ceil(durasi) * hourlyRate;
+                    
                     totalDisplay.textContent = new Intl.NumberFormat('id-ID', {
                         style: 'currency',
                         currency: 'IDR',
                         minimumFractionDigits: 0
                     }).format(total);
 
-                    // Hapus class error jika durasi valid
+                    // Hapus error visual
                     startInput.classList.remove('border-red-500');
                     endInput.classList.remove('border-red-500');
                 } else {
-                    durasiDisplay.textContent = 'Jam tidak valid';
+                    durasiDisplay.textContent = 'Durasi tidak valid';
                     totalDisplay.textContent = 'Rp 0';
-                    // Tambah indikator error visual
-                    if (startVal && endVal) {
-                        startInput.classList.add('border-red-500');
-                        endInput.classList.add('border-red-500');
-                    }
                 }
             } else {
                 totalDisplay.textContent = 'Rp 0';
@@ -259,7 +260,7 @@
         startInput.addEventListener('change', calculate);
         endInput.addEventListener('change', calculate);
 
-        // Trigger saat load (untuk old input validation)
+        // Jalankan saat load
         calculate();
     });
 </script>

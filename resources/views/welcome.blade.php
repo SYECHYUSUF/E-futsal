@@ -34,7 +34,7 @@
 
     <section id="home" class="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
         <div class="absolute inset-0 z-0">
-            <img src="https://images.unsplash.com/photo-1575361204480-aadea25d4e68?q=80&w=2071&auto=format&fit=crop"
+            <img src="https://cdn.grid.id/crop/0x0:0x0/x/photo/2024/11/15/lapangan-sepak-bolajpg-20241115074613.jpg "
                 alt="Futsal Field"
                 class="w-full h-full object-cover opacity-40">
             <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/80 to-transparent"></div>
@@ -95,7 +95,7 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div class="group relative bg-slate-800 rounded-3xl overflow-hidden border border-slate-700 hover:border-emerald-500/50 transition-all duration-300 hover:shadow-2xl hover:shadow-emerald-900/20">
                     <div class="aspect-[4/3] overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1518605348400-437731df48d4?q=80&w=2070&auto=format&fit=crop" alt="Vinyl" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500">
+                        <img src="https://centroflor.id/wp-content/uploads/elementor/thumbs/Lapangan-dengan-Karpet-Badminton-Biru-q4gr7f6l5wmnkdww4oaoanbaw805fkwle81xchf53c.jpg" alt="Vinyl" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500">
                     </div>
                     <div class="p-6">
                         <h3 class="text-xl font-bold text-white mb-2">Lapangan Vinyl</h3>

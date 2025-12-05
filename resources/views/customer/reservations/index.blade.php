@@ -75,18 +75,27 @@
                                     {{ $reservation->start_time }} - {{ $reservation->end_time }}
                                 </div>
                             </td>
+                            
+                            {{-- PERBAIKAN DI SINI: MENGGUNAKAN LOGIKA TIMESTAMP --}}
                             <td class="px-6 py-4 text-white whitespace-nowrap">
-                                {{-- Menghitung Durasi Manual --}}
                                 @php
-                                $start = \Carbon\Carbon::parse($reservation->start_time);
-                                $end = \Carbon\Carbon::parse($reservation->end_time);
-                                if ($end->lessThan($start)) {
-                                $end->addDay();
-                                }
-                                $durasi = $end->diffInHours($start);
+                                    // 1. Setup tanggal hari ini sebagai baseline agar perbandingan jam valid
+                                    $today = date('Y-m-d');
+                                    $start = \Carbon\Carbon::parse($today . ' ' . $reservation->start_time);
+                                    $end   = \Carbon\Carbon::parse($today . ' ' . $reservation->end_time);
+
+                                    // 2. Cek Lintas Hari (Jika jam selesai lebih kecil, misal 01:00 vs 23:00)
+                                    if ($end->lessThanOrEqualTo($start)) {
+                                        $end->addDay();
+                                    }
+
+                                    // 3. Hitung Selisih Detik (Pasti positif)
+                                    $seconds = $end->timestamp - $start->timestamp;
+                                    $durasi  = $seconds / 3600; 
                                 @endphp
-                                {{ $durasi }} Jam
+                                {{ (float)$durasi }} Jam
                             </td>
+                            
                             <td class="px-6 py-4 text-emerald-400 font-bold whitespace-nowrap">
                                 Rp {{ number_format($reservation->total_price, 0, ',', '.') }}
                             </td>
@@ -98,22 +107,22 @@
                                 $statusClass = 'bg-slate-700 text-slate-400 border-slate-600'; // Default
 
                                 if ($reservation->status == 'pending') {
-                                if (!$reservation->payment_proof) {
-                                // Pending & Belum Upload Bukti
-                                $statusLabel = 'Menunggu Pembayaran';
-                                $statusClass = 'bg-red-500/10 text-red-400 border-red-500/20 animate-pulse';
-                                } else {
-                                // Pending & Sudah Upload Bukti
-                                $statusLabel = 'Menunggu Konfirmasi';
-                                $statusClass = 'bg-orange-500/10 text-orange-400 border-orange-500/20';
-                                }
+                                    if (!$reservation->payment_proof) {
+                                        // Pending & Belum Upload Bukti
+                                        $statusLabel = 'Menunggu Pembayaran';
+                                        $statusClass = 'bg-red-500/10 text-red-400 border-red-500/20 animate-pulse';
+                                    } else {
+                                        // Pending & Sudah Upload Bukti
+                                        $statusLabel = 'Menunggu Konfirmasi';
+                                        $statusClass = 'bg-orange-500/10 text-orange-400 border-orange-500/20';
+                                    }
                                 } elseif ($reservation->status == 'paid') {
-                                $statusLabel = 'Sudah Dibayar';
-                                $statusClass = 'bg-blue-500/10 text-blue-400 border-blue-500/20';
+                                    $statusLabel = 'Sudah Dibayar';
+                                    $statusClass = 'bg-blue-500/10 text-blue-400 border-blue-500/20';
                                 } elseif ($reservation->status == 'confirmed') {
-                                $statusClass = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
+                                    $statusClass = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
                                 } elseif ($reservation->status == 'cancelled') {
-                                $statusClass = 'bg-slate-700 text-slate-500 border-slate-600';
+                                    $statusClass = 'bg-slate-700 text-slate-500 border-slate-600';
                                 }
                                 @endphp
                                 <span class="px-3 py-1 inline-flex text-xs leading-5 font-medium rounded-full border {{ $statusClass }}">
