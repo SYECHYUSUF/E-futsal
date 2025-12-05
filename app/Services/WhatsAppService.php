@@ -7,37 +7,34 @@ use Illuminate\Support\Facades\Log;
 
 class WhatsAppService
 {
-    protected $backendUrl;
+    protected $token;
 
     public function __construct()
     {
-        // URL ke file index.php di folder backend Anda.
-        // Sesuaikan jika port atau nama foldernya beda.
-        $this->backendUrl = 'http://localhost/efutsal-backend/index.php';
+        // Token diambil dari file index.php yang Anda berikan
+        // Sebaiknya nanti dipindah ke .env (FONNTE_TOKEN=nbbXMT5fWHrhRs7VPBK7)
+        $this->token = env('FONNTE_TOKEN', 'nbbXMT5fWHrhRs7VPBK7');
     }
 
     /**
-     * Mengirim request ke Backend PHP Native untuk memproses WA
-     *
-     * @param string $target Nomor HP tujuan
-     * @param string $message Isi pesan
-     * @return bool
+     * Kirim pesan WhatsApp via Fonnte API
      */
     public function sendMessage($target, $message)
     {
         try {
-            // Kita "tembak" file backend Anda dengan membawa data target & text
-            $response = Http::get($this->backendUrl, [
+            $response = Http::withHeaders([
+                'Authorization' => $this->token,
+            ])->post('https://api.fonnte.com/send', [
                 'target' => $target,
-                'text'   => $message,
+                'message' => $message,
+                'countryCode' => '62', // Opsional, default 62
             ]);
 
-            // Cek log laravel (storage/logs/laravel.log) untuk debugging
             if ($response->successful()) {
-                Log::info("WA Terkirim ke Backend: {$target}");
+                Log::info("WA Terkirim ke {$target}");
                 return true;
             } else {
-                Log::error("Gagal konek ke Backend WA: " . $response->body());
+                Log::error("Gagal kirim WA Fonnte: " . $response->body());
                 return false;
             }
         } catch (\Exception $e) {

@@ -32,7 +32,7 @@
             <div class="lg:col-span-2 space-y-8">
 
                 {{-- 1. BAGIAN GALERI FOTO --}}
-                @if($field->galleries && $field->galleries->count() > 0)
+                @if($field->image || ($field->galleries && $field->galleries->count() > 0))
                 <div>
                     <h3 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
                         <svg class="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -44,20 +44,32 @@
                         {{-- Foto Utama (Thumbnail Kecil) --}}
                         @if($field->image)
                         <div class="relative aspect-square rounded-xl overflow-hidden border border-slate-700 group cursor-pointer">
-                            <img src="{{ asset('storage/' . $field->image) }}" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
+                            {{-- FIX GAMBAR UTAMA --}}
+                            <img src="{{ Str::startsWith($field->image, 'http') ? $field->image : asset('storage/' . $field->image) }}" 
+                                 class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
+                            
                             <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
                                 <span class="text-xs font-bold text-white bg-black/50 px-2 py-1 rounded">Utama</span>
                             </div>
-                            <a href="{{ asset('storage/' . $field->image) }}" target="_blank" class="absolute inset-0 z-10"></a>
+                            
+                            {{-- FIX LINK ZOOM --}}
+                            <a href="{{ Str::startsWith($field->image, 'http') ? $field->image : asset('storage/' . $field->image) }}" 
+                               target="_blank" class="absolute inset-0 z-10"></a>
                         </div>
                         @endif
 
                         {{-- Loop Galeri Tambahan --}}
                         @foreach($field->galleries as $gallery)
                         <div class="relative aspect-square rounded-xl overflow-hidden border border-slate-700 group cursor-pointer">
-                            <img src="{{ asset('storage/' . $gallery->image) }}" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
+                            {{-- FIX GAMBAR GALERI --}}
+                            <img src="{{ Str::startsWith($gallery->image, 'http') ? $gallery->image : asset('storage/' . $gallery->image) }}" 
+                                 class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
+                            
                             <div class="absolute inset-0 bg-black/20 group-hover:bg-black/0 transition"></div>
-                            <a href="{{ asset('storage/' . $gallery->image) }}" target="_blank" class="absolute inset-0 z-10"></a>
+                            
+                            {{-- FIX LINK ZOOM GALERI --}}
+                            <a href="{{ Str::startsWith($gallery->image, 'http') ? $gallery->image : asset('storage/' . $gallery->image) }}" 
+                               target="_blank" class="absolute inset-0 z-10"></a>
                         </div>
                         @endforeach
                     </div>
@@ -160,8 +172,10 @@
 
                     <div class="flex items-start gap-4 mb-6 pb-6 border-b border-slate-700">
                         @if ($field->image)
-                        <img src="{{ asset('storage/' . $field->image) }}" alt="{{ $field->name }}"
-                            class="w-20 h-20 object-cover rounded-lg border border-slate-600">
+                            {{-- FIX GAMBAR SIDEBAR --}}
+                            <img src="{{ Str::startsWith($field->image, 'http') ? $field->image : asset('storage/' . $field->image) }}" 
+                                 alt="{{ $field->name }}"
+                                 class="w-20 h-20 object-cover rounded-lg border border-slate-600">
                         @else
                         <div class="w-20 h-20 bg-slate-700 rounded-lg flex items-center justify-center text-slate-500 text-xs">
                             No Image
@@ -197,7 +211,7 @@
     </div>
 </div>
 
-{{-- SCRIPT PERHITUNGAN HARGA --}}
+{{-- SCRIPT PERHITUNGAN HARGA (SUDAH FIX MINUS) --}}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const startInput = document.getElementById('start_time');
@@ -213,43 +227,44 @@
             const endVal = endInput.value;
 
             if (startVal && endVal) {
-                // Ambil angka jam saja (substring 0-2)
                 const startHour = parseInt(startVal.substring(0, 2));
                 const endHour = parseInt(endVal.substring(0, 2));
 
                 let durasi = 0;
 
                 if (endHour > startHour) {
-                    // Kasus normal (Main jam 14 s/d 16) = 2 jam
+                    // Normal (Main jam 14 - 16)
                     durasi = endHour - startHour;
                 } else if (endHour < startHour) {
-                    // Kasus lintas hari (Main jam 23 s/d 01)
-                    // (24 - 23) + 1 = 2 jam
+                    // Lintas hari (23:00 - 01:00)
                     durasi = (24 - startHour) + endHour;
                 } else {
-                    // Jam sama persis (Main jam 14 s/d 14) = 0 jam (invalid)
+                    // Jam sama (Invalid)
                     durasi = 0;
                 }
 
                 // Tampilkan Hasil
                 if (durasi > 0) {
                     durasiDisplay.textContent = `Durasi: ${durasi} Jam`;
-                    
-                    // Hitung total (bulatkan durasi ke atas jika kebijakan anda membulatkan jam)
-                    const total = Math.ceil(durasi) * hourlyRate;
-                    
+
+                    const total = durasi * hourlyRate;
                     totalDisplay.textContent = new Intl.NumberFormat('id-ID', {
                         style: 'currency',
                         currency: 'IDR',
                         minimumFractionDigits: 0
                     }).format(total);
 
-                    // Hapus error visual
+                    // Hapus class error jika durasi valid
                     startInput.classList.remove('border-red-500');
                     endInput.classList.remove('border-red-500');
                 } else {
-                    durasiDisplay.textContent = 'Durasi tidak valid';
+                    durasiDisplay.textContent = 'Jam tidak valid';
                     totalDisplay.textContent = 'Rp 0';
+                    // Tambah indikator error visual
+                    if (startVal && endVal) {
+                        startInput.classList.add('border-red-500');
+                        endInput.classList.add('border-red-500');
+                    }
                 }
             } else {
                 totalDisplay.textContent = 'Rp 0';
@@ -260,7 +275,7 @@
         startInput.addEventListener('change', calculate);
         endInput.addEventListener('change', calculate);
 
-        // Jalankan saat load
+        // Trigger saat load (untuk old input validation)
         calculate();
     });
 </script>

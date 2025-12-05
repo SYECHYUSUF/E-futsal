@@ -135,32 +135,48 @@ class ReservationController extends Controller
      */
     public function uploadPayment(Request $request, Reservation $reservation)
     {
-        // Validasi User & Status
+        // 1. Validasi User
         if ($reservation->user_id !== Auth::id()) {
             abort(403);
         }
 
-        // Validasi Gambar
+        // 2. Validasi Gambar
         $request->validate([
             'payment_proof' => 'required|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        // Hapus bukti lama jika ada (untuk re-upload)
+        // 3. Hapus bukti lama jika ada
         if ($reservation->payment_proof) {
             Storage::disk('public')->delete($reservation->payment_proof);
         }
 
-        // Simpan Gambar Baru
+        // 4. Simpan Gambar Baru
         $path = $request->file('payment_proof')->store('payment_proofs', 'public');
 
-        // Update Database
+        // 5. Update Database (Ubah status jadi 'paid' agar admin cek)
         $reservation->update([
             'payment_proof' => $path,
-            // Opsional: Ubah status jadi 'paid' agar admin tahu sudah bayar
-            // Atau biarkan 'pending' sampai admin konfirmasi manual
-            'status' => 'paid'
+            'status' => 'paid' 
         ]);
 
-        return back()->with('success', 'Bukti pembayaran berhasil diupload!');
+        // --- TAMBAHAN NOTIFIKASI WA KE ADMIN ---
+        try {
+            $adminNumber = env('WHATSAPP_ADMIN_NUMBER', '085342505228'); // Default nomor Anda
+            
+            $message = "Halo Admin, user *" . Auth::user()->name . "* telah mengupload bukti pembayaran.\n\n";
+            $message .= "No Invoice: *RES-" . $reservation->id . "*\n";
+            $message .= "Tanggal Main: *" . \Carbon\Carbon::parse($reservation->booking_date)->format('d F Y') . "*\n";
+            $message .= "Total: *Rp " . number_format($reservation->total_price, 0, ',', '.') . "*\n\n";
+            $message .= "Mohon segera dicek dan dikonfirmasi.";
+
+            $this->whatsappService->sendMessage($adminNumber, $message);
+        
+        } catch (\Exception $e) {
+            // Jangan sampai error WA mengganggu proses upload
+            \Illuminate\Support\Facades\Log::error("Gagal notif upload bayar: " . $e->getMessage());
+        }
+        // ----------------------------------------
+
+        return back()->with('success', 'Bukti pembayaran berhasil diupload! Admin telah dinotifikasi.');
     }
 }
