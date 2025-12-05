@@ -50,7 +50,7 @@
             </div>
         
             {{-- 2. STATS SECTION (Trust Signals) --}}
-            <div class="container mx-auto px-4">
+            <div class="container mx-auto px-4 mb-4">
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-6 bg-slate-800/50 border border-slate-700 rounded-3xl p-8 backdrop-blur-sm">
                     <div class="text-center">
                         <div class="text-4xl font-bold text-white mb-2">3+</div>
@@ -72,12 +72,12 @@
             </div>
         
             {{-- 3. STORY & MISSION --}}
-            <div class="container mx-auto px-4">
+            <div class="container mx-auto px-4 space-y-2">
                 <div class="grid md:grid-cols-2 gap-12 items-center">
                     {{-- Kolom Kiri: Visual --}}
-                    <div class="relative group">
+                    <div class="relative group ">
                         <div class="absolute -inset-1 bg-gradient-to-r from-emerald-600 to-teal-600 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
-                        <div class="relative bg-slate-800 border border-slate-700 rounded-2xl p-8 h-full flex flex-col justify-center items-center text-center space-y-6">
+                        <div class="relative bg-slate-800 border border-slate-700 rounded-2xl p-8 h-full flex flex-col justify-center items-center text-center space-y-6 mb-4">
                             <div class="w-20 h-20 bg-emerald-500/10 rounded-full flex items-center justify-center mb-4">
                                 <svg class="w-10 h-10 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
