@@ -1,59 +1,151 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# eFutsal - Sistem Informasi Reservasi Lapangan Futsal
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+> **Tugas Final - Pemrograman Web A** > Universitas Hasanuddin
 
-## About Laravel
+Sistem informasi berbasis web untuk reservasi lapangan futsal yang terintegrasi dengan **WhatsApp Gateway** (Fonnte) untuk notifikasi otomatis.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 👥 Anggota Kelompok 11
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+| Nama | NIM | Peran |
+| :--- | :--- | :--- |
+| **Dwi Wahyu Ilahi Angka** | **H071241089** | *Lead Developer / Backend* |
+| **Moch. Syekh Yusuf M** | **H071241093** | *Frontend / UI Designer* |
+| **Muhammad Alif Sakti** | **H071241018** | *System Analyst / Tester* |
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## 📖 Tentang Aplikasi
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+**eFutsal** adalah solusi digital untuk mempermudah proses pemesanan lapangan futsal. Aplikasi ini menggantikan sistem pencatatan manual dengan sistem otomatis yang mampu menangani jadwal, perhitungan tarif (termasuk lintas hari), dan konfirmasi pembayaran.
 
-## Laravel Sponsors
+### Fitur Utama:
+* **User/Customer:**
+    * Cek jadwal ketersediaan lapangan secara *real-time*.
+    * Booking lapangan dengan perhitungan harga otomatis.
+    * Upload bukti pembayaran.
+    * Menerima notifikasi WhatsApp saat booking disetujui/ditolak.
+* **Administrator:**
+    * Dashboard ringkasan pendapatan dan statistik booking.
+    * Manajemen data lapangan (CRUD Foto & Fasilitas).
+    * Verifikasi bukti pembayaran (Approve/Reject).
+    * Sistem notifikasi otomatis ke Customer via WhatsApp.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+---
 
-### Premium Partners
+## 🛠️ Teknologi yang Digunakan
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+* **Framework:** [Laravel](https://laravel.com/) (MVC Architecture)
+* **Database:** MySQL
+* **Frontend:** Blade Templates + [Tailwind CSS](https://tailwindcss.com/)
+* **Authentication:** Laravel Breeze
+* **API Service:** [Fonnte](https://fonnte.com/) (WhatsApp Gateway)
 
-## Contributing
+---
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## ⚙️ Dokumentasi Teknis & Instalasi
 
-## Code of Conduct
+Ikuti langkah-langkah berikut untuk menjalankan proyek ini di komputer lokal (*Localhost*).
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### Prasyarat
+* PHP >= 8.2
+* Composer
+* Node.js & NPM
+* MySQL (XAMPP/Laragon)
 
-## Security Vulnerabilities
+### Langkah Instalasi
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+1.  **Clone Repository / Extract File**
+    Masuk ke direktori proyek melalui terminal:
+    ```bash
+    cd efutsal-blade
+    ```
 
-## License
+2.  **Instalasi Dependensi**
+    Install *library* PHP dan aset *frontend*:
+    ```bash
+    composer install
+    npm install
+    ```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+3.  **Konfigurasi Environment (.env)**
+    Salin file contoh konfigurasi dan buat file `.env` baru:
+    ```bash
+    cp .env.example .env
+    ```
+    Buka file `.env` dan sesuaikan konfigurasi berikut:
+    ```env
+    APP_URL=http://localhost:8000
+    
+    # Database
+    DB_CONNECTION=mysql
+    DB_HOST=127.0.0.1
+    DB_PORT=3306
+    DB_DATABASE=efutsal_blade
+    DB_USERNAME=root
+    DB_PASSWORD=
+
+    # WhatsApp Gateway (Fonnte)
+    FONNTE_TOKEN=masukkan_token_fonnte_disini
+    WHATSAPP_ADMIN_NUMBER=08xxxxxxxxxx
+    ```
+
+4.  **Generate Key & Database Seeding**
+    Generate kunci aplikasi dan jalankan migrasi database beserta data awal (*seeder*):
+    ```bash
+    php artisan key:generate
+    php artisan migrate:fresh --seed
+    ```
+    *(Command ini akan membuat akun Admin default dan data Lapangan)*
+
+5.  **Setup Storage**
+    Agar gambar dapat diakses publik:
+    ```bash
+    php artisan storage:link
+    ```
+
+6.  **Jalankan Aplikasi**
+    Buka dua terminal terpisah dan jalankan perintah berikut:
+    
+    *Terminal 1 (Laravel Server):*
+    ```bash
+    php artisan serve
+    ```
+    
+    *Terminal 2 (Vite Compiler):*
+    ```bash
+    npm run dev
+    ```
+
+Akses aplikasi di: [http://localhost:8000](http://localhost:8000)
+
+---
+
+## 📘 Dokumentasi Pengguna
+
+### 1. Alur Pelanggan (Customer)
+1.  **Registrasi:** Buat akun baru melalui menu *Register*. Pastikan nomor WhatsApp aktif.
+2.  **Cari Lapangan:** Pilih menu "Cari Lapangan" untuk melihat opsi lapangan, foto, dan harga.
+3.  **Booking:** * Klik "Booking Sekarang".
+    * Pilih Tanggal, Jam Mulai, dan Jam Selesai.
+    * Klik "Konfirmasi". Status pesanan menjadi *Pending*.
+4.  **Pembayaran:**
+    * Buka menu "Riwayat Booking".
+    * Klik "Detail" pada pesanan.
+    * Unggah foto bukti transfer. Status berubah menjadi *Paid*.
+
+### 2. Alur Administrator
+1.  **Login Admin:** Gunakan akun admin (Email: `admin@example.com`, Pass: `password`).
+2.  **Verifikasi Booking:**
+    * Buka menu "Daftar Reservasi".
+    * Cek pesanan dengan status *Paid*.
+    * Validasi bukti transfer.
+    * Klik **Approve** (Setujui) atau **Reject** (Tolak).
+3.  **Notifikasi:** * Saat Admin klik *Approve*, sistem otomatis mengirim pesan WhatsApp ke pelanggan berisi detail jadwal main.
+
+---
+
+
+
+**Dibuat dengan ❤️ oleh Kelompok 11 - 2025**
